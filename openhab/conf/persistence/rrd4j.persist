@@ -1,0 +1,6 @@
+Strategies {
+    everyMinute : "0 * * * * ?"
+}
+Items {
+    Power_W : strategy = everyChange, everyMinute
+}

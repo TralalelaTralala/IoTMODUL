@@ -1,0 +1,16 @@
+# OpenHAB receives sensor and actuator states and can publish only control commands.
+user openhab
+topic read iotmodul/+/+/state
+topic read iotmodul/+/state
+topic read iotmodul/status/simulator
+topic write iotmodul/+/+/set
+topic write iotmodul/+/set
+topic write iotmodul/status/openhab
+
+# Simulator receives commands and publishes state only.
+user simulator
+topic read iotmodul/+/+/set
+topic read iotmodul/+/set
+topic write iotmodul/+/+/state
+topic write iotmodul/+/state
+topic write iotmodul/status/simulator

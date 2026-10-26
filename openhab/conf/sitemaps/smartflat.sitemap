@@ -1,0 +1,32 @@
+sitemap smartflat label="Енергоощадна розумна квартира" {
+    Frame label="Стан квартири" {
+        Text item=Apartment_Status label="Режим [%s]"
+        Text item=Alert_Message label="Сповіщення [%s]"
+        Text item=Eco_Mode label="Економний режим [MAP(uk.map):%s]"
+    }
+    Frame label="Вітальня" {
+        Text item=Living_Motion label="Датчик руху [MAP(uk.map):%s]"
+        Text item=Living_Lux label="Освітленість [%.0f лк]"
+        Slider item=Living_Light label="Яскравість світла (%) [%d]"
+    }
+    Frame label="Спальня" {
+        Text item=Bedroom_Motion label="Датчик руху [MAP(uk.map):%s]"
+        Text item=Bedroom_Lux label="Освітленість [%.0f лк]"
+        Slider item=Bedroom_Light label="Яскравість світла (%) [%d]"
+    }
+    Frame label="Клімат та енергія" {
+        Text item=Temperature label="Температура [%.1f °C]"
+        Text item=Humidity label="Вологість [%.0f %%]"
+        Text item=Power_W label="Споживана потужність [%.0f Вт]"
+        Text item=Heater label="Обігрівач [MAP(uk.map):%s]"
+        Setpoint item=Heater_Setpoint minValue=15 maxValue=24 step=0.5 label="Температурна уставка [%.1f °C]"
+        Chart item=Power_W period=h refresh=10 label="Потужність за останню годину"
+    }
+    Frame label="Демонстрація" {
+        Switch item=Demo_Overload label="Увімкнути тест потужності понад 2500 Вт"
+        Text label="Щоб побачити сповіщення, увімкніть тест на 1 хвилину. Після перевірки вимкніть його."
+        Switch item=Demo_Away label="Демо: нікого вдома (таймер 30 с)"
+        Text label="Симулятор зупиняє рух; через 30 с вмикається «Економ» (17 °C). Вимкніть — з'явиться рух і 21 °C."
+    }
+}
+

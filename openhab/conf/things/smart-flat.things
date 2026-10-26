@@ -1,0 +1,19 @@
+Thing mqtt:topic:apartment "Датчики та виконавчі пристрої квартири" (mqtt:broker:iotmodul) {
+    Channels:
+        Type switch : livingMotion "Рух у вітальні" [ stateTopic="iotmodul/living/motion/state" ]
+        Type number : livingLux "Освітленість у вітальні" [ stateTopic="iotmodul/living/lux/state" ]
+        Type dimmer : livingLight "Світло у вітальні" [ stateTopic="iotmodul/living/light/state", commandTopic="iotmodul/living/light/set" ]
+
+        Type switch : bedroomMotion "Рух у спальні" [ stateTopic="iotmodul/bedroom/motion/state" ]
+        Type number : bedroomLux "Освітленість у спальні" [ stateTopic="iotmodul/bedroom/lux/state" ]
+        Type dimmer : bedroomLight "Світло у спальні" [ stateTopic="iotmodul/bedroom/light/state", commandTopic="iotmodul/bedroom/light/set" ]
+
+        Type number : temperature "Температура" [ stateTopic="iotmodul/climate/temperature/state" ]
+        Type number : humidity "Вологість" [ stateTopic="iotmodul/climate/humidity/state" ]
+        Type number : power "Споживана потужність" [ stateTopic="iotmodul/power/state" ]
+
+        Type switch : heater "Обігрівач" [ stateTopic="iotmodul/heater/state", commandTopic="iotmodul/heater/set" ]
+        Type number : setpoint "Задана температура" [ stateTopic="iotmodul/heater/setpoint/state", commandTopic="iotmodul/heater/setpoint/set" ]
+        Type switch : overloadTest "Тест перевантаження" [ stateTopic="iotmodul/demo/overload/state", commandTopic="iotmodul/demo/overload/set" ]
+        Type switch : awayDemo "Демо: нікого вдома" [ stateTopic="iotmodul/demo/away/state", commandTopic="iotmodul/demo/away/set" ]
+}

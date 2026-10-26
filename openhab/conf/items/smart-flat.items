@@ -1,0 +1,21 @@
+Group gMotion "Датчики руху"
+
+Switch Living_Motion "Рух у вітальні [MAP(uk.map):%s]" (gMotion) { channel="mqtt:topic:apartment:livingMotion" }
+Number Living_Lux "Освітленість у вітальні [%.0f лк]" { channel="mqtt:topic:apartment:livingLux" }
+Dimmer Living_Light "Світло у вітальні, % [%d]" { channel="mqtt:topic:apartment:livingLight" }
+
+Switch Bedroom_Motion "Рух у спальні [MAP(uk.map):%s]" (gMotion) { channel="mqtt:topic:apartment:bedroomMotion" }
+Number Bedroom_Lux "Освітленість у спальні [%.0f лк]" { channel="mqtt:topic:apartment:bedroomLux" }
+Dimmer Bedroom_Light "Світло у спальні, % [%d]" { channel="mqtt:topic:apartment:bedroomLight" }
+
+Number Temperature "Температура [%.1f °C]" { channel="mqtt:topic:apartment:temperature" }
+Number Humidity "Вологість [%.0f %%]" { channel="mqtt:topic:apartment:humidity" }
+Number Power_W "Споживана потужність [%.0f Вт]" { channel="mqtt:topic:apartment:power" }
+Switch Heater "Обігрівач [MAP(uk.map):%s]" { channel="mqtt:topic:apartment:heater" }
+Number Heater_Setpoint "Задана температура [%.1f °C]" { channel="mqtt:topic:apartment:setpoint" }
+Switch Demo_Overload "Тест перевантаження [MAP(uk.map):%s]" { channel="mqtt:topic:apartment:overloadTest" }
+Switch Demo_Away "Демо: нікого вдома [MAP(uk.map):%s]" { channel="mqtt:topic:apartment:awayDemo" }
+Switch Eco_Mode "Економний режим [MAP(uk.map):%s]"
+String Apartment_Status "Стан квартири [%s]"
+String Alert_Message "Сповіщення [%s]"
+

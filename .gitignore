@@ -1,0 +1,13 @@
+openhab/userdata/
+openhab/addons/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+mosquitto/certs/
+openhab/userdata/mqtt-truststore*
+*.key
+*.pem
+*.p12
+*.jks

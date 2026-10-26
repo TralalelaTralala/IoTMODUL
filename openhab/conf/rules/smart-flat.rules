@@ -1,0 +1,144 @@
+var Timer livingLightTimer = null
+var Timer bedroomLightTimer = null
+var Timer emptyApartmentTimer = null
+var Timer overloadTimer = null
+
+rule "Початковий стан квартири"
+when
+    System started
+then
+    createTimer(now.plusSeconds(15), [ |
+        if (Alert_Message.state == NULL) Alert_Message.postUpdate("Норма")
+        if (Eco_Mode.state == NULL) Eco_Mode.postUpdate(OFF)
+        if (Apartment_Status.state == NULL) Apartment_Status.postUpdate("Система готова")
+    ])
+end
+
+rule "Вітальня: світло за рухом та освітленістю"
+when
+    Item Living_Motion changed to ON
+then
+    if (Living_Lux.state instanceof Number && (Living_Lux.state as Number) < 50) {
+        Living_Light.sendCommand(70)
+    }
+    if (livingLightTimer !== null) livingLightTimer.cancel
+    livingLightTimer = createTimer(now.plusMinutes(5), [ |
+        if (Living_Motion.state != ON) Living_Light.sendCommand(OFF)
+        livingLightTimer = null
+    ])
+end
+
+rule "Вітальня: вимкнути світло, якщо кімната освітлена"
+when
+    Item Living_Lux changed
+then
+    if (Living_Motion.state == ON && Living_Lux.state instanceof Number && (Living_Lux.state as Number) >= 50) {
+        Living_Light.sendCommand(0)
+    }
+end
+
+rule "Спальня: світло за рухом та освітленістю"
+when
+    Item Bedroom_Motion changed to ON
+then
+    if (Bedroom_Lux.state instanceof Number && (Bedroom_Lux.state as Number) < 50) {
+        Bedroom_Light.sendCommand(70)
+    }
+    if (bedroomLightTimer !== null) bedroomLightTimer.cancel
+    bedroomLightTimer = createTimer(now.plusMinutes(5), [ |
+        if (Bedroom_Motion.state != ON) Bedroom_Light.sendCommand(OFF)
+        bedroomLightTimer = null
+    ])
+end
+
+rule "Спальня: вимкнути світло, якщо кімната освітлена"
+when
+    Item Bedroom_Lux changed
+then
+    if (Bedroom_Motion.state == ON && Bedroom_Lux.state instanceof Number && (Bedroom_Lux.state as Number) >= 50) {
+        Bedroom_Light.sendCommand(0)
+    }
+end
+
+rule "Присутність: увімкнути комфортний режим"
+when
+    Member of gMotion changed to ON
+then
+    if (emptyApartmentTimer !== null) {
+        emptyApartmentTimer.cancel
+        emptyApartmentTimer = null
+    }
+    Eco_Mode.postUpdate(OFF)
+    Apartment_Status.postUpdate("Комфортний режим")
+    Heater_Setpoint.sendCommand(21)
+end
+
+rule "Квартира порожня: запустити 30-хвилинний таймер"
+when
+    Member of gMotion changed to OFF or
+    Item Demo_Away changed to ON
+then
+    if (Living_Motion.state == OFF && Bedroom_Motion.state == OFF) {
+        if (emptyApartmentTimer !== null) emptyApartmentTimer.cancel
+        // У демо-режимі «Нікого вдома» таймер прискорено: 30 секунд замість 30 хвилин
+        val emptyDelay = if (Demo_Away.state == ON) now.plusSeconds(30) else now.plusMinutes(30)
+        emptyApartmentTimer = createTimer(emptyDelay, [ |
+            if (Living_Motion.state == OFF && Bedroom_Motion.state == OFF) {
+                Eco_Mode.postUpdate(ON)
+                Apartment_Status.postUpdate("Економний режим")
+                Heater_Setpoint.sendCommand(17)
+            }
+            emptyApartmentTimer = null
+        ])
+    }
+end
+
+rule "Керування обігрівачем за заданою температурою"
+when
+    Item Temperature changed or
+    Item Heater_Setpoint changed
+then
+    if (Alert_Message.state != NULL && Alert_Message.state.toString.startsWith("УВАГА:")) {
+        Heater.sendCommand(OFF)
+    } else if (Temperature.state instanceof Number && Heater_Setpoint.state instanceof Number) {
+        if ((Temperature.state as Number) < (Heater_Setpoint.state as Number)) {
+            Heater.sendCommand(ON)
+        } else {
+            Heater.sendCommand(OFF)
+        }
+    }
+end
+
+rule "Перевантаження: якщо потужність висока понад хвилину"
+when
+    Item Power_W changed
+then
+    if (Power_W.state instanceof Number && (Power_W.state as Number) > 2500) {
+        if (overloadTimer === null) {
+            overloadTimer = createTimer(now.plusMinutes(1), [ |
+                if (Power_W.state instanceof Number && (Power_W.state as Number) > 2500) {
+                    Alert_Message.postUpdate("УВАГА: потужність понад 2500 Вт більше 1 хв. Обігрівач вимкнено.")
+                    Heater.sendCommand(OFF)
+                    Apartment_Status.postUpdate("Перевантаження")
+                }
+                overloadTimer = null
+            ])
+        }
+    } else {
+        if (overloadTimer !== null) {
+            overloadTimer.cancel
+            overloadTimer = null
+        }
+        if (Alert_Message.state != NULL && Alert_Message.state.toString.startsWith("УВАГА:")) {
+            Alert_Message.postUpdate("Норма")
+            if (Living_Motion.state == ON || Bedroom_Motion.state == ON) {
+                Apartment_Status.postUpdate("Комфортний режим")
+            } else if (Eco_Mode.state == ON) {
+                Apartment_Status.postUpdate("Економний режим")
+            } else {
+                Apartment_Status.postUpdate("Захист скинуто")
+            }
+        }
+    }
+end
+
